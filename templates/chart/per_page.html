@@ -1,0 +1,7 @@
+<form method="get">
+  <select name="per_page" onchange="this.form.submit()">
+    <option value="50" {% if request.GET.per_page == "50" %}selected{% endif %}>50件/ページ</option>
+    <option value="100" {% if request.GET.per_page == "100" %}selected{% endif %}>100件/ページ</option>
+    <option value="200" {% if request.GET.per_page == "200" %}selected{% endif %}>200件/ページ</option>
+  </select>
+</form>

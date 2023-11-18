@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}チャート{% endblock title %}
+{% block content %}
+<div class="container-fluid custom-container">
+  <div class="row">
+    <div class="col-9">
+      <h3 class="text-center">{{ chart.pair }} {{ chart.get_rule_display }}</h3>
+      <div class="col" style="overflow-x: auto;">
+        <a href="{% url "chart:chart_image" id %}">
+           <img src="data:image/png;base64,{{ image_data  }}" alt="Chart">
+        </a>
+      </div>
+    </div>
+    <div class="col">
+      <form class="" action="{% url 'chart:chart_update' id %}" method="post">
+        {% csrf_token %}
+        {# {{ form.as_p }} #}
+        <p>
+          保存名：{{ form.name }}
+        </p>
+        <p>
+          基準時刻：{{ form.standard_datetime }}
+        </p>
+        <p>
+          足：{{ form.rule }}
+        </p>
+        <p>
+          通貨ペア：{{ form.pair }}
+        </p>
+        <p>
+          正方向表示本数：{{ form.plus_delta }}
+        </p>
+        <p>
+          負方向表示本数：{{ form.minus_delta }}
+        </p>
+        <p>
+          説明：
+        </p>
+          {{ form.memo }}
+        <p>
+          <button type="submit" class="btn btn-primary btn-sm">更新</button>
+          <a href="{% url 'chart:chart_delete' id %}" class="btn btn-danger btn-sm">削除</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
+{% include 'chart/history_table_jp.html' %}
+{% endblock content %}

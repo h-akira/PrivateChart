@@ -1,0 +1,15 @@
+<div class="pagination">
+  <span class="step-links">
+    {% if histories.has_previous %}
+      <a href="?page=1">&laquo; 最初</a>
+      <a href="?page={{ histories.previous_page_number }}">前へ</a>
+    {% endif %}
+    <span class="current">
+      ページ {{ histories.number }} / {{ histories.paginator.num_pages }}
+    </span>
+    {% if histories.has_next %}
+      <a href="?page={{ histories.next_page_number }}">次へ</a>
+      <a href="?page={{ histories.paginator.num_pages }}">最後 &raquo;</a>
+    {% endif %}
+  </span>
+</div>

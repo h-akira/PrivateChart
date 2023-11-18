@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load boost %}
+
+{% block title %}チャート一覧{% endblock title %}
+{% block content %}
+<h1>チャート</h1><nobr>
+<a href='{% url "chart:chart_create" %}' class="btn btn-success btn">新規作成</a>
+<div class="table-responsive">
+  <table class="table table-bordered border-dark text-nowrap" style="table-layout:fixed;">
+    <tbody>
+      <tr class="table-warning text-center">
+        {% for h,w in header|zip:width %}
+        <th scope="col" style="width: {{ w }}px;">
+            {{ h }}
+        </th>
+        {% endfor %}
+      </tr>
+      {% for chart,link in charts|zip:links %}
+      <tr class="text-center">
+        <td>
+          {{ chart.name }}
+        </td>
+        <td>
+          {{ chart.pair }}
+        </td>
+        <td>
+          {{ chart.rule }}
+        </td>
+        <td>
+          {{ chart.standard_datetime }}
+        </td>
+        <td>
+          {{ link }}
+        </td>
+        <td>
+          <a href='{% url "chart:chart_detail" chart.id %}' class="btn btn-sm btn-danger btn">開く</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+{% endblock content %}

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>アカウント作成</h3>
+<p>
+  現在，アカウント作成が制限されております．
+</p>
+<a href="{% url 'home:index' %}" class="btn btn-primary">ホームに戻る</a>
+<a href="{% url 'login' %}" class="btn btn-success">ログインフォーム</a>
+{% endblock content %}

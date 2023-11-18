@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load boost %}
+
+{% block title %}レビュー一覧{% endblock title %}
+{% block content %}
+<h1>レビュー</h1><nobr>
+<a href='{% url "chart:review_create" %}' class="btn btn-success btn">新規作成</a>
+{% for review in reviews %}
+<div class="card">
+  <h5 class="card-header">{{ review.dt }}</h5>
+  <div class="card-body">
+    <h5 class="card-title">{{ review.name }}</h5>
+    <p class="card-text">{{ review.memo }}</p>
+    <a href="{% url 'chart:review' review.id %}" class="btn btn-primary">開く</a>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock content %}

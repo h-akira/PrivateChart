@@ -1,0 +1,59 @@
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  {% for tab_name in chart_tabs %}
+  <li class="nav-item" role="presentation">
+    {% if forloop.counter == 1 %}
+    <button
+      class="nav-link active"
+      id="home-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#tab{{ forloop.counter }}"
+      type="button"
+      role="tab"
+      aria-controls="home"
+      aria-selected="true"
+    >
+    {% else %}
+    <button
+      class="nav-link"
+      id="profile-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#tab{{ forloop.counter }}"
+      type="button"
+      role="tab"
+      aria-controls="profile"
+      aria-selected="false"
+    >
+    {% endif %}
+    {{ tab_name }}
+    </button>
+  </li>
+  {% endfor %}
+</ul>
+<div class="tab-content" id="myTabContent">
+  {% for head, url, image in chart_bodys %}
+  {% if forloop.counter == 1 %}
+  <div
+    class="tab-pane fade show active"
+    id="tab{{ forloop.counter }}"
+    role="tabpanel"
+    aria-labelledby="home-tab"
+  >
+  {% else %}
+  <div
+    class="tab-pane fade"
+    id="tab{{ forloop.counter }}"
+    role="tabpanel"
+    aria-labelledby="profile-tab"
+  >
+  {% endif %}
+    {% if image == None %}
+    データが存在しません．
+    {% else %}
+    <h4 class="text-center">{{ head }}</h4>
+    <a href="{{ url }}">
+      <img src="data:image/png;base64,{{ image }}" alt="Chart">
+    </a>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>

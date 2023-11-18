@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}取引履歴{% endblock title %}
+{% block content %}
+<h1>取引履歴</h1>
+{% include 'chart/per_page.html' %}
+{% include 'chart/history_paginator.html' %}
+<form class="" action='{% url "chart:chart_generate" %}' method="post">
+{% include 'chart/history_table_jp.html' %}
+</form>
+{% include 'chart/history_paginator.html' %}
+{% endblock content %}

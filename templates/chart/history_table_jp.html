@@ -1,0 +1,147 @@
+{% load boost %}
+{% csrf_token %}
+<div class="table-responsive">
+  <table class="table table-bordered border-dark text-nowrap" style="table-layout:fixed;">
+    <tbody>
+      <tr class="table-light text-center border-dark">
+        {% for h,w in header|zip:width %}
+        <th scope="col" style="width: {{ w }}px;">
+            {{ h }}
+        </th>
+        {% endfor %}
+        {% if box %}
+        <th scope="col" style="width: 80px;">
+          {% if checked %}
+          登録
+          {% else %}
+          <button type="submit" class="btn btn-primary btn-sm">作成</button>
+          {% endif %}
+        </th>
+        {% endif %}
+      </tr>
+      {% for history in histories %}
+      {% if history.kind == "settlement" %}
+      <tr class="text-center table-success border-dark">
+      {% elif history.kind == "new" %}
+      <tr class="text-center table-warning border-dark">
+      {% else %}
+      <tr class="text-center">
+      {% endif %}
+        <td>
+          {{ history.account }}
+        </td>
+        <td>
+          {{ history.order_number }}
+        </td>
+        <td>
+          {% if history.kind == "settlement" %}
+          決済
+          {% elif history.kind == "new" %}
+          新規
+          {% else %}
+          {{ history.kind }}
+          {% endif %}
+        </td>
+        <td>
+          {{ history.pair }}
+        </td>
+        <td>
+          {% if history.buy_sell == "buy" %}
+          <div class="text-danger">
+            買
+          </div>
+          {% elif history.buy_sell == "sell" %}
+          <div class="text-primary">
+            売
+          </div>
+          {% else %}
+          <div>
+          {{ history.buy_sell }}
+          </div>
+          {% endif %}
+        </td>
+        <td>
+          {% if history.order_type == "market" %}
+          成行
+          {% elif history.order_type == "limit" %}
+          指値
+          {% elif history.order_type == "stop" %}
+          逆指値
+          {% else %}
+          {{ history.order_type }}
+          {% endif %}
+        </td>
+        <td>
+          {{ history.quantity }}
+        </td>
+        <td>
+          {% if history.state == "executed" %}
+          <div class="text-success">
+            決済済
+          </div>
+          {% elif history.state == "canceled" %}
+          <div class="text-secondary">
+            取消済
+          </div>
+          {% elif history.state == "accepted" %}
+          <div class="text-primary">
+            受付済
+          </div>
+          {% else %}
+          <div>
+            {{ history.state }}
+          </div>
+          {% endif %}
+        </td>
+        <td>
+          {{ history.revocation_reason|default_if_none:'' }}
+        </td>
+        <td>
+          {{ history.order_datetime|date:"Y-m-d H:i:s" }}
+        </td>
+        <td>
+          {{ history.order_rate }}
+        </td>
+        <td>
+          {% if history.condition == "market" %}
+          成行
+          {% elif history.condition == "limit" %}
+          指値
+          {% elif history.condition == "stop" %}
+          逆指値
+          {% else %}
+          {{ history.condition }}
+          {% endif %}
+        </td>
+        <td>
+          {{ history.execution_datetime|date:"Y-m-d H:i:s" }}
+        </td>
+        <td>
+          {{ history.execution_rate|default_if_none:'' }}
+        </td>
+        <td>
+          {% if history.profit >= 0 %}
+          +{{ history.profit|default_if_none:'' }}
+          {% else %}
+          <div class="text-danger">
+          {{ history.profit|default_if_none:'' }}
+          </div>
+          {% endif %}
+        </td>
+        <td>
+          {{ history.swap|default_if_none:'' }}
+        </td>
+        {% if box %}
+        <td>
+          {% if checked %}
+          <input type="checkbox" name="register" value="{{ history.id }}" checked>
+          {% else %}
+          <input type="checkbox" name="register" value="{{ history.id }}">
+          {% endif %}
+        </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

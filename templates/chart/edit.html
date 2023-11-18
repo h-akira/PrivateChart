@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}新規作成{% endblock title %}
+{% block content %}
+<h1>新規作成</h1>
+<form class="" action="{% url 'chart:chart_add' %}" method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  {% if table %}
+  {% include 'chart/history_table_jp.html' %}
+  {% endif %}
+  <button type="submit" class="btn btn-primary btn-sm">登録</button>
+</form>
+{% endblock content %}

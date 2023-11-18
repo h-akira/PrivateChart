@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}レビュー作成{% endblock title %}
+{% block content %}
+<form class="" action="{% url 'chart:review_create' %}" method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary btn-sm">保存</button>
+</form>
+{% endblock content %}

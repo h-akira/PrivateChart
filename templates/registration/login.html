@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>ログインフォーム</h3>
+<form method="post">
+  {% csrf_token %}
+  {% for error in form.errors.values %}
+    {{ error }}
+  {% endfor %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary">ログイン</button>
+  <a href="{% url 'home:index' %}" class="btn btn-primary">ホームに戻る</a>
+  <a href="{% url 'accounts:signup' %}" class="btn btn-success">アカウント作成フォーム</a>
+</form>
+{% endblock content %}
