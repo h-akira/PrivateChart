@@ -13,6 +13,7 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from django.db.models import Q
 from django.db.models import Sum
+from django.conf import settings
 # modelsとforms
 from .models import HistoryTable, ChartTable, HistoryLinkTable, ReviewTable, PositionTable
 from .forms import ChartForm, ReviewForm, ReviewUpdateForm, PositionSpeedForm, PositionMarketForm, PositionUpdateForm
@@ -26,6 +27,10 @@ import base64
 from matplotlib import use
 use("Agg")
 import mplfinance as mpf
+
+import pandas_datareader.data as web
+import yfinance as yf
+yf.pdr_override()
 
 # 曜日変換要
 WEEK = ("月","火","水","木","金","土","日")
@@ -120,27 +125,84 @@ def chart_image(request,id, _HttpResponse=True, _chart=None, histories=None):
     histories = sorted(histories, reverse=True, key=lambda x: x.id)
     histories = sorted(histories, reverse=True, key=lambda x: x.order_datetime)
   # 為替データを取得
+  # daysは要調整
   if "H" in _chart.rule:
-    days = 40
+    days = 60
   elif "D" in _chart.rule:
     days = 240
+  elif _chart.rule[-1] == "T":
+    minutes = int(_chart.rule[:-1])
+    if minutes <= 3:
+      days = 4
+    elif minutes <= 15:
+      days = 7
+    else:
+      days = 10
   else:
+    print("Warning: chart_image: rule may not be valid")
     days = 10
+  start_date = (_chart.standard_datetime-datetime.timedelta(days=days)).date()
+  end_date = (_chart.standard_datetime+datetime.timedelta(days=days)).date()
   df = lib.chart.GMO_dir2DataFrame(
     os.path.join(os.path.dirname(__file__), "../data/rate"), 
     pair=_chart.pair,
     date_range=[
-      (_chart.standard_datetime-datetime.timedelta(days=days)).date(),
-      (_chart.standard_datetime+datetime.timedelta(days=days)).date()
-    ]
+      start_date,end_date
+    ],
+    guarantee=True
   ) 
-  # 足を変換
-  df = lib.chart.resample(df, _chart.rule)
+  if df is None:
+    yf = True
+  else:
+    yf = False
+    # 足を変換
+    df = lib.chart.resample(df, _chart.rule)
+    if len(df)<_chart.plus_delta+_chart.minus_delta+60:  # 要調整
+      yf = True
+  if yf:
+    interval = _chart.rule.replace("T", "m").replace("H", "h").replace("D", "d")
+    if interval not in ["1m", "2m", "5m", "15m", "30m", "60m", "90m", "1h", "1d"]:
+      resample = True
+      interval = str(1)+interval[-1]
+    else:
+      resample = False
+    if "^" in _chart.pair:
+      ticker = _chart.pair
+    else:
+      ticker = f'{_chart.pair.replace("/","")}=X'
+    # daysは要調整
+    if interval == "1m":
+      days = 3
+    elif interval == "2m":
+      days = 5
+    elif interval == "5m":
+      days = 10
+    elif interval in ["15m", "30m"]:
+      days = 25
+    elif interval in ["60m", "90m", "1h"]:
+      days = 50
+    else:
+      days = 240
+    start_datetime = _chart.standard_datetime-datetime.timedelta(days=days)
+    end_datetime = _chart.standard_datetime+datetime.timedelta(days=days)
+    end_datetime = min(end_datetime, datetime.datetime.now(timezone(settings.TIME_ZONE))-datetime.timedelta(minutes=1))
+    df = web.get_data_yahoo(tickers=ticker,start=start_datetime, end=end_datetime, interval=interval)
+    if df.index[0].tzinfo is None:
+      df.index = df.index.tz_localize('UTC')
+    df.index = df.index.tz_convert('Asia/Tokyo')
+    if resample:
+      df = chart.chart.resample(df, _chart.rule)
+
+  if yf:
+    print("get data from yahoo finance")
+  else:
+    print("get data from GMO")
   # テクニカル指標を追加
   df = lib.chart_settings.add_technical_columns(df)
   # 最もstandard_datetimeに近い列の周辺のデータを取得する
   target_datetime = pd.Timestamp(_chart.standard_datetime)
-  nearest_index = (pd.DataFrame(df.index) - target_datetime).abs().idxmin().date
+  # nearest_index = (pd.DataFrame(df.index) - target_datetime).abs().idxmin().date
+  nearest_index = (pd.DataFrame(df.index) - target_datetime).abs().idxmin().Datetime
   start_index = max(0, nearest_index - _chart.minus_delta)
   end_index = min(nearest_index + _chart.plus_delta, len(df) - 1)
   df = df.iloc[start_index:end_index+1]

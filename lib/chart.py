@@ -24,10 +24,11 @@ def plus_latest(df, filename="currency.csv"):
   latest_df.set_index("date", inplace=True)
   latest_df.index = df.index.tz_localize(timezone('Asia/Tokyo'))
 
-def GMO_dir2DataFrame(dir_name,pair="USDJPY",date_range=None, BID_ASK="BID"):
+def GMO_dir2DataFrame(dir_name,pair="USDJPY",date_range=None, BID_ASK="BID", guarantee=False):
   # pairは"/"を含んでいてもいなくても処理可能
   # date_rangeはdatetime.date型を要素に持つリストまたはタプル
   # ディレクトリ構造は以下の通り:
+  # guaranteeがTrueの場合はdate_rangeの範囲内のデータが保証されない時にNoneを変えす
   # .
   # |-USDJPY
   # | |-202303
@@ -41,6 +42,8 @@ def GMO_dir2DataFrame(dir_name,pair="USDJPY",date_range=None, BID_ASK="BID"):
   # |   |-...
   # |-EURJPY
   #    |-...
+  latest_date = datetime.date(1970,1,1)
+  oldest_date = datetime.date(2100,1,1)
   file_list = glob.glob(os.path.join(dir_name,pair.replace("/",""))+f"/*/{pair.replace('/','')}_*.csv")
   df = pd.DataFrame()
   for file in file_list:
@@ -50,6 +53,8 @@ def GMO_dir2DataFrame(dir_name,pair="USDJPY",date_range=None, BID_ASK="BID"):
     m = re.search(r"\d{4}\d{2}\d{2}", file)
     if m:
       file_date = datetime.datetime.strptime(m.group(),"%Y%m%d").date()  # 日付文字列を取得
+      latest_date = max(latest_date, file_date)
+      oldest_date = min(oldest_date, file_date)
     else:
       continue
     if date_range != None:
@@ -58,8 +63,16 @@ def GMO_dir2DataFrame(dir_name,pair="USDJPY",date_range=None, BID_ASK="BID"):
       else:
         continue
     df = pd.concat([df,GMO_csv2DataFrame(file,BID_ASK=BID_ASK)])
-  df = df.sort_values(by="date", ascending=True)
-  return df
+  if len(df) == 0:
+    return None
+  else:
+    df = df.sort_values(by="Datetime", ascending=True)
+    if guarantee and date_range != None:
+      if latest_date + datetime.timedelta(days=1) < date_range[1]:
+        return None
+      if oldest_date > date_range[0]:
+        return None
+    return df
 
 def GMO_csv2DataFrame(file_name,BID_ASK="BID"):
   # GMOクリック証券からダウンロードしたヒストリカルデータ（CSVファイル）を読み込み，
@@ -68,7 +81,7 @@ def GMO_csv2DataFrame(file_name,BID_ASK="BID"):
     raise FileNotFoundError(f"{file_name}は存在しません．")
   df = pd.read_csv(file_name, encoding='shift_jis').rename(
     columns={
-      '日時':'date', 
+      '日時':'Datetime', 
       f'始値({BID_ASK})':'Open', 
       f'高値({BID_ASK})':'High', 
       f'安値({BID_ASK})':'Low', 
@@ -76,10 +89,10 @@ def GMO_csv2DataFrame(file_name,BID_ASK="BID"):
     }
   )
   for col in df:
-    if col not in ["Open", "High", "Low", "Close", "date"]:
+    if col not in ["Open", "High", "Low", "Close", "Datetime"]:
       df = df.drop(col, axis=1) 
-  df["date"] = pd.to_datetime(df["date"])
-  df.set_index("date", inplace=True)
+  df["Datetime"] = pd.to_datetime(df["Datetime"])
+  df.set_index("Datetime", inplace=True)
   df.index = df.index.tz_localize(timezone('Asia/Tokyo'))
   return df
 
