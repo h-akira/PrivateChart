@@ -25,6 +25,12 @@ PAIR = (
   ("AUD/JPY","AUD/JPY")
 )
 
+class TagTable(models.Model):
+  user = models.ForeignKey(User,on_delete=models.CASCADE)
+  name = models.CharField(max_length=255)
+  memo = models.TextField()
+  color = models.CharField(max_length=10,null=True, blank=True)
+
 class HistoryTable(models.Model):
   user = models.ForeignKey(User,on_delete=models.CASCADE)
   account = models.CharField(max_length=50)
@@ -67,6 +73,7 @@ class ChartTable(models.Model):
   rule = models.CharField(max_length=10, choices=RULE)
   standard_datetime = models.DateTimeField()
   minus_delta = models.IntegerField(default=100)
+  tags = models.ManyToManyField(TagTable, related_name="chart_tags")
   plus_delta = models.IntegerField(default=100)
   memo = models.TextField(null=True, blank=True)
 

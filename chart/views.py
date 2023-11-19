@@ -10,12 +10,14 @@ from django.http import HttpResponse
 from django.db.models import Avg
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.db.models import Q
 from django.db.models import Sum
 from django.conf import settings
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin
 # modelsとforms
-from .models import HistoryTable, ChartTable, HistoryLinkTable, ReviewTable, PositionTable
+from .models import HistoryTable, ChartTable, HistoryLinkTable, ReviewTable, PositionTable, TagTable
 from .forms import ChartForm, ReviewForm, ReviewUpdateForm, PositionSpeedForm, PositionMarketForm, PositionUpdateForm
 # 独自関数
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -74,6 +76,41 @@ history_width = [
 ]
 
 RATE_DIR = os.path.join(os.path.dirname(__file__), "../data/rate") 
+
+
+class TagListView(LoginRequiredMixin, ListView):
+  template_name = 'chart/tag_index.html'
+  def get_queryset(self):
+    user = self.request.user
+    print(len(TagTable.objects.filter(user=user)))
+    return TagTable.objects.filter(user=user)
+
+class TagCreateView(LoginRequiredMixin, CreateView):
+  model = TagTable
+  fields = ('name','memo', 'color')
+  template_name = 'chart/tag_edit.html'
+  success_url = reverse_lazy('chart:tag_index')
+  def form_valid(self, form):
+    form.instance.user = self.request.user
+    return super(TagCreateView, self).form_valid(form)
+  def get_context_data(self):
+    context = super().get_context_data()
+    context["edit_type"] = "create"
+    return context
+
+class TagUpdateView(LoginRequiredMixin, UpdateView):
+  model = TagTable
+  fields = ('name','memo', 'color')
+  template_name = 'chart/tag_edit.html'
+  def get_context_data(self):
+    context = super().get_context_data()
+    context["edit_type"] = "update"
+    return context
+
+class TagDeleteView(LoginRequiredMixin, DeleteView):
+  model = TagTable
+  template_name = 'chart/tag_delete.html'
+  success_url = reverse_lazy('chart:tag_index')
 
 @login_required
 def history(request):
