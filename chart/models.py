@@ -38,7 +38,7 @@ COLOR = (
 class TagTable(models.Model):
   user = models.ForeignKey(User,on_delete=models.CASCADE)
   name = models.CharField(max_length=255)
-  memo = models.TextField()
+  memo = models.TextField(null=True, blank=True)
   color = models.CharField(max_length=31,null=True, blank=True, choices=COLOR, default="#FFE4E1")
   def __str__(self):
     return self.name
