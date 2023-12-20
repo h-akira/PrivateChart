@@ -4,7 +4,8 @@ from .models import ChartTable, ReviewTable, PositionTable, TagTable
 class ChartForm(forms.ModelForm):
   tags = forms.ModelMultipleChoiceField(
     queryset=TagTable.objects,
-    widget=forms.CheckboxSelectMultiple
+    widget=forms.CheckboxSelectMultiple,
+    required=False
   )  
   class Meta:
     model = ChartTable

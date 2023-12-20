@@ -85,7 +85,7 @@ class ChartTable(models.Model):
   rule = models.CharField(max_length=10, choices=RULE)
   standard_datetime = models.DateTimeField()
   minus_delta = models.IntegerField(default=100)
-  tags = models.ManyToManyField(TagTable, related_name="chart_tags")
+  tags = models.ManyToManyField(TagTable, related_name="chart_tags", blank=True)
   plus_delta = models.IntegerField(default=100)
   memo = models.TextField(null=True, blank=True)
   def __str__(self):
