@@ -135,6 +135,7 @@ def chart_index(request):
   links = [HistoryLinkTable.objects.filter(chart=i).count() for i in _charts]
   header = [
     "登録名",
+    "タグ",
     "通貨ペア",
     "足",
     "基準日時",
@@ -143,6 +144,7 @@ def chart_index(request):
   ]
   width = [
   200,  # 登録名
+  200, # タグ
   100,  # 通貨ペア
   50,  # 足
   200,  # 基準日時

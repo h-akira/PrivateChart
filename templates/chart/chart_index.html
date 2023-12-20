@@ -21,6 +21,10 @@
           {{ chart.name }}
         </td>
         <td>
+          {% for tag in chart.tags.all %}
+          <span class="btn btn-sm" style="background-color: {{ tag.color }}">{{ tag.name }}</span>
+          {% endfor %}
+        <td>
           {{ chart.pair }}
         </td>
         <td>

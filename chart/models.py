@@ -29,16 +29,17 @@ COLOR = (
   ("#FFA500","オレンジ"),
   ("#FFFF00","黄"),
   ("#00FF00","緑"),
+  ("#ADFF2F","黄緑"),
   ("#00FFFF","水色"),
-  ("#0000FF","青"),
-  ("#800080","紫"),
+  ("#FF00FF","紫"),
+  ("#FFE4E1","デフォルト"),
 )
 
 class TagTable(models.Model):
   user = models.ForeignKey(User,on_delete=models.CASCADE)
   name = models.CharField(max_length=255)
   memo = models.TextField()
-  color = models.CharField(max_length=31,null=True, blank=True, choices=COLOR)
+  color = models.CharField(max_length=31,null=True, blank=True, choices=COLOR, default="#FFE4E1")
   def __str__(self):
     return self.name
 
