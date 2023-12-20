@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}削除{% endblock title %}
+{% block content %}
+  <h1>{{ object.name }}を削除しますか？</h1>
+  <form method="post">
+    {% csrf_token %}
+    <button class="btn btn-danger btn-sm" type="submit">削除</button>
+    <a href="{% url 'chart:tag_index' %}" class="btn btn-secondary btn-sm">キャンセル</a>
+  </form>
+{% endblock %}

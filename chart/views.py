@@ -102,6 +102,7 @@ class TagUpdateView(LoginRequiredMixin, UpdateView):
   model = TagTable
   fields = ('name','memo', 'color')
   template_name = 'chart/tag_edit.html'
+  success_url = reverse_lazy('chart:tag_index')
   def get_context_data(self):
     context = super().get_context_data()
     context["edit_type"] = "update"
@@ -365,9 +366,11 @@ def none2edit(request):
     "minus_delta":100
   }
   form = ChartForm(initial=initial)
+  tags = TagTable.objects.filter(user=request.user)
   context = {
     "form":form,
     "table":False,
+    "tags":tags,
   }
   return render(request, 'chart/edit.html', context)
 
@@ -778,6 +781,9 @@ def position_update(request,id):
         )
       form.save()
       return redirect("chart:review",_position.review.id)
+
+
+
 
 ###############################################################
 # 以下は内部処理用

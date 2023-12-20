@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load boost %}
+
+{% block title %}タグ一覧{% endblock title %}
+{% block content %}
+<h1>タグ</h1>
+<a href='{% url "chart:tag_create" %}' class="btn btn-success btn">新規作成</a>
+{% for tag in object_list %}
+{% if tag.color %}
+<div class="card" style="background-color: {{ tag.color }};">
+{% else %}
+<div class="card">
+{% endif %}
+  <div class="card-body">
+    <h5 class="card-title">{{ tag.name }}</h5>
+    <p class="card-text">{{ tag.memo }}</p>
+    <a href="{% url 'chart:tag_update' tag.id %}" class="btn btn-primary btn-sm">編集</a>
+    <a href="{% url 'chart:tag_delete' tag.id %}" class="btn btn-danger btn-sm">削除</a>
+  </div>
+</div>
+{% endfor %}
+{% endblock content %}

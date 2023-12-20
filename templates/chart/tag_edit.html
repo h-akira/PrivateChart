@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}新規作成{% endblock title %}
+{% block content %}
+{% if edit_type == 'create' %}
+<h1>新規作成</h1>
+{% elif edit_type == 'update' %}
+<h1>編集</h1>
+{% endif %}
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary btn-sm">登録</button>
+  {% if edit_type == 'update' %}
+  <a href="{% url 'chart:tag_delete' object.id %}" class="btn btn-danger btn-sm">削除</a>
+  {% endif %}
+  <a href="{% url 'chart:tag_index' %}" class="btn btn-secondary btn-sm">一覧に戻る</a>
+</form>
+{% endblock content %}

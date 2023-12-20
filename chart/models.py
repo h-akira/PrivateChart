@@ -24,12 +24,23 @@ PAIR = (
   ("GBP/JPY","GBP/JPY"),
   ("AUD/JPY","AUD/JPY")
 )
+COLOR = (
+  ("#FF0000","赤"),
+  ("#FFA500","オレンジ"),
+  ("#FFFF00","黄"),
+  ("#00FF00","緑"),
+  ("#00FFFF","水色"),
+  ("#0000FF","青"),
+  ("#800080","紫"),
+)
 
 class TagTable(models.Model):
   user = models.ForeignKey(User,on_delete=models.CASCADE)
   name = models.CharField(max_length=255)
   memo = models.TextField()
-  color = models.CharField(max_length=10,null=True, blank=True)
+  color = models.CharField(max_length=31,null=True, blank=True, choices=COLOR)
+  def __str__(self):
+    return self.name
 
 class HistoryTable(models.Model):
   user = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -76,6 +87,8 @@ class ChartTable(models.Model):
   tags = models.ManyToManyField(TagTable, related_name="chart_tags")
   plus_delta = models.IntegerField(default=100)
   memo = models.TextField(null=True, blank=True)
+  def __str__(self):
+    return self.name
 
 class HistoryLinkTable(models.Model):
   chart = models.ForeignKey(ChartTable, on_delete=models.CASCADE)
@@ -109,5 +122,4 @@ class PositionTable(models.Model):
   profit = models.IntegerField(null=True, blank=True)
   settlement_datetime = models.DateTimeField(null=True, blank=True)
   settlement_rate = models.FloatField(null=True, blank=True)
-
 

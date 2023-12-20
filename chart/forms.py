@@ -1,11 +1,15 @@
 from django import forms
-from .models import ChartTable, ReviewTable, PositionTable
+from .models import ChartTable, ReviewTable, PositionTable, TagTable
 
 class ChartForm(forms.ModelForm):
+  tags = forms.ModelMultipleChoiceField(
+    queryset=TagTable.objects,
+    widget=forms.CheckboxSelectMultiple
+  )  
   class Meta:
     model = ChartTable
     # fields = ("user", 'name', 'pair', 'rule',"standard_datetime", "minus_delta", "plus_delta", "memo")
-    fields = ('name', 'pair', 'rule',"standard_datetime", "minus_delta", "plus_delta", "memo")
+    fields = ('name', 'pair', 'rule',"standard_datetime", "minus_delta", "plus_delta", "memo","tags")
     widgets = {
       'memo': forms.Textarea(
         attrs={
@@ -68,5 +72,14 @@ class PositionUpdateForm(forms.ModelForm):
       "limit": forms.NumberInput(attrs={"style":"width:100px", "step":"0.001"}),
       "stop": forms.NumberInput(attrs={"style":"width:100px", "step":"0.001"})
     }
+
+class TagForm(forms.Form):
+  class Meta:
+    model = TagTable
+    fields = ("name","memo","color")
+    
+
+
+
 
 
